@@ -22,9 +22,9 @@ client.on("ready", () => {
 });
 const prefix = discordConfig.message.prefix;
 
-function matchUser(userId, matchId) {
-  Users.updateOne({ discordid: userId }, { matchid: matchId });
-  Users.updateOne({ discordid: matchId }, { matchid: userId });
+async function matchUser(userId, matchId) {
+  await Users.updateOne({ discordid: userId }, { matchid: matchId });
+  await Users.updateOne({ discordid: matchId }, { matchid: userId });
 }
 function botSendMessage(id, message) {
   client.users
@@ -38,7 +38,7 @@ function botSendMessage(id, message) {
 }
 
 client.on("message", (msg) => {
-  // console.log('message :>> ', msg);
+  console.log("message :>> ", msg.content);
   //* No command
   Users.findOne({ discordid: msg.author.id }).then((user) => {
     if (!user) {
@@ -75,6 +75,7 @@ client.on("message", (msg) => {
     if (args[0] == "chat") {
       Users.findOne({ discordid: msg.author.id }).then((user) => {
         console.log("Tìm người");
+        console.log("user :>> ", user);
         if (user.matchid) {
           msg.channel.send(
             "Bạn đang trò chuyện với một người. bạn có muốn kết thúc nó. `!pp`"
@@ -96,9 +97,9 @@ client.on("message", (msg) => {
                 msg.channel.send("Không tìm thấy một ai");
               } else {
                 let i = Math.floor(Math.random() * useron.length);
-
-                msg.channel.send("Đã tìm thấy. Vui lòng chờ kết nối");
                 matchUser(msg.author.id, useron[i].discordid);
+
+                msg.channel.send("Đã tìm thấy");
                 botSendMessage(useron[i].discordid, "Đã tìm thấy");
               }
             });
