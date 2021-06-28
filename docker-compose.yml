@@ -1,0 +1,37 @@
+version: "3.9"
+
+services:
+  server:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    image: discord-bot
+    container_name: discord-bot
+    command: npm start
+    volumes:
+      - ./:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - mongo
+    env_file: ./.env
+    environment:
+      - NODE_ENV=development
+      - MONGO_URI=mongodb://mongo:27017/tbot
+    networks:
+      - app-network
+  mongo:
+    image: mongo:latest
+    volumes:
+      - data-volume:/data/db
+    ports:
+      - "27016:27017"
+    networks:
+      - app-network
+networks:
+  app-network:
+    driver: bridge
+volumes:
+    data-volume:
+    node_modules:
+    web-root:
+        driver: local
